@@ -42,6 +42,10 @@ classdef layer < handle
             % create initial matrix with values between [-1, 1]
             self.w = (rand(neurons, inputs) - 0.5) * 2;
             self.b = (rand(neurons, 1) - 0.5) * 2;
+            
+            % initialize net input and net output
+            self.n = 0;
+            self.a = 0;
         end
 
         %
