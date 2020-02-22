@@ -215,7 +215,7 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                a=layers{end}.a;
+                a=layers{end}.a
 
                 % Iterate through output layer neurons and 
                 % choose maximum of neurons as network's
