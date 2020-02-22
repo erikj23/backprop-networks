@@ -12,4 +12,4 @@ r.layers{2}.b = [0.48];
 r.layers{2}.n = 0;
 r.layers{2}.a = 0;
 
-r.train(1, {{[1], 1+sin(pi/4)}});
+r.train(1, {{[1] 1+sin(pi/4)}});

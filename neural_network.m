@@ -98,6 +98,7 @@ classdef neural_network < handle
                 a=self.layers{m}.activate(a);
             end
             e=t-a;
+            
         end
         
         %
@@ -157,13 +158,16 @@ classdef neural_network < handle
                 error('no training set')
             end
             
+            % mse container for plot, these are y values 
+            mse = zeros(1, length(self.layers));
+            
             % backpropagation algorithm
-            for k=1:epochs       
+            for k=1:epochs
                 for sample=1:length(training_set)
                     p = training_set{sample}{1};
                     t = training_set{sample}{2};
                     
-                    % step 1: forward prop ang get error
+                    % step 1: forward prop and get error
                     e = self.forward_propagation(p, t);
                     
                     % step 2 & 3: back prop and set sensitivities
@@ -172,6 +176,7 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p);
                 end
+                mse(k) = e^2;
             end
         end
     end
