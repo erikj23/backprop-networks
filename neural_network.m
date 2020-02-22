@@ -89,7 +89,7 @@ classdef neural_network < handle
         % INPUT t: target
         % OUTPUT e: error at final layer
         %
-        function [e] = forward_propagation(self, p, t)
+        function [a] = forward_propagation(self, p)
             % compute output of first layer
             a=self.layers{1}.activate(p);      
             
@@ -97,7 +97,11 @@ classdef neural_network < handle
             for m=2:length(self.layers)
                 a=self.layers{m}.activate(a);
             end
-            e=t-a;
+        end
+        
+        % Compute Error 
+        function [e] = error(a, t)
+           e=t-a;
         end
         
         %
@@ -164,7 +168,10 @@ classdef neural_network < handle
                     t = training_set{sample}{2};
                     
                     % step 1: forward prop ang get error
-                    e = self.forward_propagation(p, t);
+                  
+                    a = self.forward_propagation(p);
+                    
+                    e = self.error(a, t);
                     
                     % step 2 & 3: back prop and set sensitivities
                     self.backpropagate_sensitivities(e);
@@ -173,6 +180,32 @@ classdef neural_network < handle
                     self.update_layers(p);
                 end
             end
+        end
+        
+        function n_correct = evaluate(self, test_set)
+            predicted=-1;
+            predictions=zeros(size(test_set{1}{2}));
+            max=0;
+            n_correct=0;
+           
+            for sample=1:length(test_set)
+             p=training_set{sample}{1};
+             t=training_set{sample}{2};
+             
+             a=self.forward_propagation(p);
+             
+             for i=1:length(a)
+               if a(i,1)>max
+                  max=a(i,1);
+                  predicted=i-1;
+               end
+             end
+             
+             predictions(predicted,1)=1;
+             
+             n_correct = n_correct + isequal(predictions,t);
+             
+           end
         end
     end
 end
