@@ -88,12 +88,10 @@ classdef layer < handle
         function sensitivity_M(self, e)
             % chapter 11 example uses purelin, so d/dn = 1, parameters = 0
             % checking number of parameters with nargin
-            % s = old s + new s, call to update sets to 0, for batch size 1
-            %   call is equivalent to s = 0 + new s
             if nargin(self.df)
-                self.s = self.s + -2*self.df(self.n).*e;
+                self.s = -2*self.df(self.n).*e;
             else
-                self.s = self.s + -2*self.df().*e;
+                self.s = -2*self.df().*e;
             end
         end
     
@@ -106,10 +104,8 @@ classdef layer < handle
         % INPUT w_next: weight matrix w(m+1)
         % INPUT s_next: sensitivity s(m+1)
         %
-        function sensitivity_m(self, next_w, next_s)
-            % s = old s + new s, call to update sets to 0, for batch size 1
-            %   call is equivalent to s = 0 + new s
-            self.s = self.s + self.df(self.n).*next_w'*next_s;
+        function sensitivity_m(self, w_next, s_next)
+            self.s = self.df(self.n).*w_next'*s_next;
         end
         
         %
@@ -124,7 +120,7 @@ classdef layer < handle
             self.w = self.w - (alpha * self.s * prev_a');
             self.b = self.b - (alpha * self.s);
             
-            % reset sensitivity on batch update
+            % reset s
             self.s = 0;
         end
     end
