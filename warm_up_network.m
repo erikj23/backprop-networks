@@ -1,4 +1,6 @@
-tic
+clear
+close all
+
 % build training input matrix
 p1=[-1    1    1    1    1    -1    1    -1    -1    -1    -1    1    1    -1    -1    -1    -1    1    1    -1    -1    -1    -1    1    -1    1    1    1    1    -1]';
 p2=[ -1    -1    -1    -1    -1    -1    1 -1 -1    -1    -1    -1    1    1    1    1    1    1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1]';
@@ -21,5 +23,6 @@ r.initialize(length(p1), 3, @logsig);
 % t = 3 so last layer has 3 neurons
 r.add_layer(3, @logsig);
 
-r.train(500, training_set);
+tic
+r.train(50, 2, training_set);
 toc

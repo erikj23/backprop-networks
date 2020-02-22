@@ -114,7 +114,7 @@ classdef neural_network < handle
             
             % then can calculate other layers
             for m=length(self.layers)-1:-1:1
-                 self.layers{m}.sensitivity_m(self.layers{m+1}.w, self.layers{m+1}.s)
+                 self.layers{m}.sensitivity_m(self.layers{m+1}.w, self.layers{m+1}.s);
             end
         end
         
@@ -128,11 +128,11 @@ classdef neural_network < handle
         function update_layers(self, p)
             % m >= 2 so that m-1 != 0
             for m=length(self.layers):-1:2
-                self.layers{m}.update(self.alpha, self.layers{m-1}.a)
+                self.layers{m}.update(self.alpha, self.layers{m-1}.a);
             end
             
             % first layer updated seperately
-            self.layers{1}.update(self.alpha, p)
+            self.layers{1}.update(self.alpha, p);
         end
              
         %
@@ -149,17 +149,20 @@ classdef neural_network < handle
         % INPUT neurons: training data in the format { {p t} ... } where
         %   p & t are column vectors
         %
-        function train(self, epochs, training_set)
+        function train(self, epochs, batch_size, training_set)
+            samples=length(training_set);
             if ~self.initialized
                 error('not initialized')
             elseif epochs < 1 
                 error('no epochs')
+            elseif batch_size < 1 || batch_size > samples
+                error('batch size invalid')
             elseif isempty(training_set)
                 error('no training set')
             end
             
+            %todo move graphing to another location
             % graph configuration
-            close all
             figure;
             subplot(2, 1, 1);
             hold on; grid on;
@@ -173,22 +176,24 @@ classdef neural_network < handle
             
             % backpropagation algorithm
             for k=1:epochs
-                for sample=1:length(training_set)
-                    p = training_set{sample}{1};
-                    t = training_set{sample}{2};
-                    
-                    % step 1: forward prop and get error
-                    e = self.forward_propagation(p, t);
-                    
-                    % step 2 & 3: back prop and set sensitivities
-                    self.backpropagate_sensitivities(e);
-                    
+                for sample=1:batch_size:samples
+                    for job=0:batch_size-1
+                        p = training_set{sample+job}{1};
+                        t = training_set{sample+job}{2};
+
+                        % step 1: forward prop and get error
+                        e = self.forward_propagation(p, t);
+
+                        % step 2 & 3: back prop and set sensitivities
+                        self.backpropagate_sensitivities(e);
+                    end
                     % step 4: update w & b for each layer
                     self.update_layers(p);
                 end
                 mse(k) = e'*e;
                 
             end
+            
             plot(x, mse)
             % post-computation graph configuration
             %legend('0', '4', '8')
