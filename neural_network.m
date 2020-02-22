@@ -191,7 +191,6 @@ classdef neural_network < handle
             end
             plot(x, mse)
             % post-computation graph configuration
-            set(gca, 'xtick', x)
             %legend('0', '4', '8')
             subplot(2, 1, 2)
             imagesc(self.layers{end}.w);
