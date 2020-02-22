@@ -77,7 +77,7 @@ classdef layer < handle
         end
         
         %
-        % SENSITIVITY_M propagate p through the network
+        % SENSITIVITY_M calculate sensitivity at last layer
         %
         % SYNOPSIS sensitivity_M(self, e)
         %   sets s locally for later use
@@ -95,7 +95,7 @@ classdef layer < handle
         end
     
         %
-        % SENSITIVITY_M propagate p through the network
+        % SENSITIVITY_M calculate sensitivity at layer m
         %
         % SYNOPSIS sensitivity_m(self, w_next, s_next)
         %   sets s locally for later use
