@@ -1,0 +1,40 @@
+
+% reset environment
+clear
+close all
+
+% load images & labels
+images = load_images('..\..\Downloads\train-images-idx3-ubyte');
+labels = load_labels('..\..\Downloads\train-labels-idx1-ubyte');
+
+% format {{p t} ...}
+samples=length(images);
+sample_set=cell(1, samples);
+for i=1:samples
+    sample_set{i}={images(:, i) labels(i)};
+end
+
+% hyper-parameters
+sample=sample_set{1};
+inputs=length(sample{1});
+outputs=length(sample{2});
+first_layers=[1 10 100];
+
+% shuffle sample order
+sample_set=sample_set(randperm(length(sample_set)));
+
+% split samples into a training & validation set
+testing=0.70; 
+validation=0.30;
+testing_set=sample_set(1:samples*testing);
+validation_set=sample_set(1:samples*validation);
+    
+for neurons=first_layers
+    % train the network
+    r = neural_network;
+    r.initialize(inputs, neurons, @logsig);
+    r.add_layer(outputs, @logsig)
+    tic
+    r.train(500, testing_set);
+    toc
+end

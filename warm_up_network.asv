@@ -1,6 +1,4 @@
-clear
-close all
-
+tic
 % build training input matrix
 p1=[-1    1    1    1    1    -1    1    -1    -1    -1    -1    1    1    -1    -1    -1    -1    1    1    -1    -1    -1    -1    1    -1    1    1    1    1    -1]';
 p2=[ -1    -1    -1    -1    -1    -1    1 -1 -1    -1    -1    -1    1    1    1    1    1    1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1    -1]';
@@ -18,11 +16,10 @@ training_set = {{p1 t1} {p2 t2} {p3 t3}};
 r = neural_network;
 
 % length = 30 neurons = 2 
-r.initialize(length(p1), 3, @logsig);
+r.initialize(length(p1), 2, @logsig);
 
 % t = 3 so last layer has 3 neurons
 r.add_layer(3, @logsig);
 
-tic
-r.train(50, 2, training_set);
+r.train(10000, training_set);
 toc
