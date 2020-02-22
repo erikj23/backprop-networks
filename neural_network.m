@@ -100,7 +100,7 @@ classdef neural_network < handle
         end
         
         % Compute Error 
-        function [e] = error(a, t)
+        function [e] = error(self,a, t)
            e=t-a;
         end
         
@@ -183,29 +183,41 @@ classdef neural_network < handle
         end
         
         function n_correct = evaluate(self, test_set)
-            predicted=-1;
-            predictions=zeros(size(test_set{1}{2}));
-            max=0;
+            
+            
+            
             n_correct=0;
            
             for sample=1:length(test_set)
-             p=training_set{sample}{1};
-             t=training_set{sample}{2};
-             
-             a=self.forward_propagation(p);
-             
-             for i=1:length(a)
-               if a(i,1)>max
-                  max=a(i,1);
-                  predicted=i-1;
-               end
-             end
-             
-             predictions(predicted,1)=1;
-             
-             n_correct = n_correct + isequal(predictions,t);
-             
-           end
+                predicted=-1;                               % activated neuron in final layer
+                predictions=zeros(size(test_set{1}{2}));    % vector to store values for final output
+                max=0;                                      % used to track max 
+                p=test_set{sample}{1};                      % input of test_set
+                t=test_set{sample}{2};                      % expected output of test_set
+                
+                % Push test example through network
+                a=self.forward_propagation(p);
+                
+                % Iterate through output layer neurons and 
+                % choose maximum of neurons as network's
+                % prediction
+                for i=1:length(a)
+                 i
+                 a(i,1)
+                    % determine network prediction for test example
+                    if a(i,1)>max
+                      max=a(i,1);
+                      predicted=i-1
+
+                    end
+                end
+                 t
+                 % network output
+                 predictions(predicted+1,1)=1
+                 
+                 % record network accuracy
+                 n_correct = n_correct + isequal(predictions,t)
+            end
         end
     end
 end
