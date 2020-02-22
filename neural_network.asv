@@ -163,16 +163,19 @@ classdef neural_network < handle
             figure;
             subplot(2, 1, 1);
             hold on; grid on;
-            title('mean squared error:epochs')
-            xlabel('epochs')
-            ylabel('mse')
+            title('Error as Items Stored in an Associative Network Increases')
+            xlabel('items stored')
+            ylabel('% error')
 
-            % plot data containers
-            mse = zeros(1, epochs);
-            x = 1:epochs;
+            
+            % mse container for plot
+            mse = zeros(1, length(self.layers));
+            x = zeros(1, epochs);
+            
             
             % backpropagation algorithm
             for k=1:epochs
+                mse_graph = plot(x(1:k), y)
                 for sample=1:length(training_set)
                     p = training_set{sample}{1};
                     t = training_set{sample}{2};
@@ -186,18 +189,16 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p);
                 end
-                mse(k) = e'*e;
-                
+                mse(k) = e^2;
             end
-            plot(x, mse)
             % post-computation graph configuration
             set(gca, 'xtick', x)
-            %legend('0', '4', '8')
+            %legend('0', '4', '6', 'location','best')
             subplot(2, 1, 2)
             imagesc(self.layers{end}.w);
             colormap(hsv);
             colorbar;
-            title('final weight matrix');
+            title('Final Weight Matrix');
         end
     end
 end
