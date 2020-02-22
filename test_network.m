@@ -1,3 +1,6 @@
+clear
+close all
+
 r = neural_network;
 r.initialize(1, 2, @logsig);
 r.add_layer(1, @purelin);
@@ -12,4 +15,4 @@ r.layers{2}.b = [0.48];
 r.layers{2}.n = 0;
 r.layers{2}.a = 0;
 
-r.train(1, {{[1], 1+sin(pi/4)}});
+r.train(10, 1, {{[1] 1+sin(pi/4)} {[1] 1+sin(pi/4)}});
