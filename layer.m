@@ -3,20 +3,20 @@
 % PROPERTIES
 %   w - weight matrix 
 %   b - bias vector            
+%   f - transfer function
+%   df - d/dn of transfer function
 %   n - net input
 %   a - output
 %   s - sensitivity
-%   f - transfer function
-%   df - d/dn of transfer function
 classdef layer < handle
     properties%(SetAccess = 'private')        
         w;  % weight matrix 
         b;  % bias vector            
+        f;  % transfer function
+        df; % d/dn transfer function
         n;  % net input
         a;  % output
         s;  % sensitivity
-        f;  % transfer function
-        df; % d/dn transfer function
     end
     methods
         %
@@ -40,8 +40,8 @@ classdef layer < handle
             self.df = matlabFunction(diff(transfer_function(x)));
             
             % create initial matrix with values between [-1, 1]
-            self.w = (rand(neurons, inputs) - 0.5) * 2;
-            self.b = (rand(neurons, 1) - 0.5) * 2;
+            self.w = (rand(neurons, inputs)-0.5)*2;
+            self.b = (rand(neurons, 1)-0.5)*2;
             
             % initialize net input and output and sensitivity
             self.n = 0;
@@ -59,7 +59,7 @@ classdef layer < handle
         % OUTPUT a: output of transfer function
         %
         function [a] = activate(self, p)
-            self.a = self.f(self.net_input(p));
+            self.a = self.a+self.f(self.net_input(p));
             a = self.a;
         end
 
@@ -73,7 +73,7 @@ classdef layer < handle
         % OUTPUT n: net input to transfer function
         %
         function [n] = net_input(self, p)
-            self.n = self.w * p + self.b;
+            self.n = self.w*p+self.b;
             n = self.n;
         end
         
@@ -91,25 +91,25 @@ classdef layer < handle
             % s = old s + new s, call to update sets to 0, for batch size 1
             %   call is equivalent to s = 0 + new s
             if nargin(self.df)
-                self.s = self.s + -2*self.df(self.n).*e;
+                self.s = self.s+(-2)*self.df(self.n).*e;
             else
-                self.s = self.s + -2*self.df().*e;
+                self.s = self.s+(-2)*self.df().*e;
             end
         end
     
         %
         % SENSITIVITY_M calculate sensitivity at layer m
         %
-        % SYNOPSIS sensitivity_m(self, w_next, s_next)
+        % SYNOPSIS sensitivity_m(self, next_w, next_s)
         %   sets s locally for later use
         %
-        % INPUT w_next: weight matrix w(m+1)
-        % INPUT s_next: sensitivity s(m+1)
+        % INPUT next_w: weight matrix w(m+1)
+        % INPUT next_s: sensitivity s(m+1)
         %
         function sensitivity_m(self, next_w, next_s)
             % s = old s + new s, call to update sets to 0, for batch size 1
             %   call is equivalent to s = 0 + new s
-            self.s = self.s + self.df(self.n).*next_w'*next_s;
+            self.s = self.s+self.df(self.n).*next_w'*next_s;
         end
         
         %
@@ -119,12 +119,14 @@ classdef layer < handle
         %
         % INPUT alpha: learning rate
         % INPUT prev_a: output a(m-1)
+        % INPUT batch_size: number of samples per batch
         %
-        function update(self, alpha, prev_a)
-            self.w = self.w - (alpha * self.s * prev_a');
-            self.b = self.b - (alpha * self.s);
+        function update(self, alpha, prev_a, batch_size)
+            self.w = self.w - (alpha*(self.s*prev_a')/batch_size);
+            self.b = self.b - (alpha*(self.s/batch_size));
             
-            % reset sensitivity on batch update
+            % reset output & sensitivity on batch update
+            self.a = 0;
             self.s = 0;
         end
     end

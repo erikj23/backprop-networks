@@ -109,7 +109,7 @@ classdef neural_network < handle
         % INPUT e: error at last layer
         %
         function backpropagate_sensitivities(self, e)
-            % need to first calculate last layer
+            % calculate last layer
             self.layers{end}.sensitivity_M(e);
             
             % then can calculate other layers
@@ -125,14 +125,14 @@ classdef neural_network < handle
         %
         % INPUT p: pattern
         %
-        function update_layers(self, p)
+        function update_layers(self, p, batch_size)
             % m >= 2 so that m-1 != 0
             for m=length(self.layers):-1:2
-                self.layers{m}.update(self.alpha, self.layers{m-1}.a);
+                self.layers{m}.update(self.alpha, self.layers{m-1}.a, batch_size);
             end
             
-            % first layer updated seperately
-            self.layers{1}.update(self.alpha, p);
+            % update first layer
+            self.layers{1}.update(self.alpha, p, batch_size);
         end
              
         %
@@ -146,6 +146,7 @@ classdef neural_network < handle
         %   the training set must be non-empty
         %
         % INPUT epochs: number of passes over the training set
+        % INPUT batch_size: number of samples per batch
         % INPUT neurons: training data in the format { {p t} ... } where
         %   p & t are column vectors
         %
@@ -176,8 +177,9 @@ classdef neural_network < handle
             
             % backpropagation algorithm
             for k=1:epochs
-                for sample=1:batch_size:samples
-                    for job=0:batch_size-1
+                for sample=0:batch_size:samples
+                    for job=1:mod(sample+batch_size, samples)
+                        %sample+job
                         p = training_set{sample+job}{1};
                         t = training_set{sample+job}{2};
 
@@ -188,7 +190,7 @@ classdef neural_network < handle
                         self.backpropagate_sensitivities(e);
                     end
                     % step 4: update w & b for each layer
-                    self.update_layers(p);
+                    self.update_layers(p, batch_size);
                 end
                 mse(k) = e'*e;
                 
