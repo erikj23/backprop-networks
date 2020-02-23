@@ -178,7 +178,8 @@ classdef neural_network < handle
             % backpropagation algorithm
             for k=1:epochs
                 for sample=1:batch_size:samples
-                    for job=0:batch_size-1
+                    batch=mod(sample+batch_size, samples)
+                    for job=1:batch
                         %sample+job
                         p = training_set{sample+job}{1};
                         t = training_set{sample+job}{2};
