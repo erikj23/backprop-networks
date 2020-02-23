@@ -192,7 +192,7 @@ classdef neural_network < handle
             end
         end
         
-        function n_correct = evaluate(self, test_set)
+        function n_correct = test(self, test_set)
             n_correct=0;
 
             for sample=1:length(test_set)
@@ -203,7 +203,8 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                a=layers{end}.a;
+                e=forward_propagation(p, t);
+                a=self.layers{end}.a;
 
                 % Iterate through output layer neurons and 
                 % choose maximum of neurons as network's
@@ -225,6 +226,46 @@ classdef neural_network < handle
                  % record network accuracy
                  n_correct = n_correct + isequal(predictions,t)
             end
+        end
+        
+        function accuracy_rates = test_noisy(test_set, experiments)
+            
+            % used to store test set of corrupted images
+            corrupted_test_set=cell(size(test_set));
+
+            % one accuracy rate per experiment
+            accuracy_rates=zeros(experiments,1); 
+            
+            examples=length(test_set(1,:))
+            tests=10;
+            pixels=0;
+            correct=0;
+            
+            for k=1:experiments
+                for i=1:tests
+                    for j=1:examples
+                        
+                        
+                        % get example and ground truth
+                        p=test_set{j}{1};                      
+                        t=test_set{j}{2};                     
+
+                        % add noise to test patterns
+                        corrupted = addNoise(p(:,j),pixels);
+
+                        % add corrupted sample to noisy test_set
+                        corrupted_test_set{j}{1}=corrupted;
+                        corrupted_test_set{j}{2}=t;   
+                    end
+
+                    % test model against ground truth and record 
+                    correct=test(test_set);
+                end
+               
+                accuracy_rates(k,1)=(correct/(10*examples))*100;
+                
+            end
+
         end
     end
 end
