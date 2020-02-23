@@ -24,5 +24,5 @@ r.initialize(length(p1), 3, @logsig);
 r.add_layer(3, @logsig);
 
 tic
-r.train(50, 2, training_set);
+r.train(50, 1, training_set);
 toc

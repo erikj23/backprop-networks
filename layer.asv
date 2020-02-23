@@ -111,7 +111,7 @@ classdef layer < handle
         function sensitivity_m(self, next_w, next_s)
             % s = old s + new s, call to update sets to 0, for batch size 1
             %   call is equivalent to s = 0 + new s
-            self.s = self.df(self.n).*next_w'*next_s;
+            self.s = self.s+self.df(self.n).*next_w'*next_s;
         end
         
         %
@@ -127,7 +127,7 @@ classdef layer < handle
             self.w = self.w - (alpha*(self.s*prev_a')/batch_size);
             self.b = self.b - (alpha*(self.s/batch_size));
             
-            % reset batch accumulator on update
+            % reset b on batch update
             self.q = 0;
         end
     end

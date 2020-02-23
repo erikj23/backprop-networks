@@ -37,6 +37,6 @@ for neurons=first_layers
     
     % time the performance
     tic
-    r.train(10, testing_set);
+    r.train(5,100, testing_set);
     toc
 end
