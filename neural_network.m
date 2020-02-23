@@ -98,7 +98,6 @@ classdef neural_network < handle
                 a=self.layers{m}.activate(a);
             end
             e=t-a;
-            
         end
         
         %
@@ -108,14 +107,19 @@ classdef neural_network < handle
         %
         % INPUT e: error at last layer
         %
-        function backpropagate_sensitivities(self, e)
+        function backpropagate_sensitivities(self, e, p)
             % calculate last layer
-            self.layers{end}.sensitivity_M(e);
+            self.layers{end}.sensitivity_M(e, self.layers{end-1}.a);
             
-            % then can calculate other layers
-            for m=length(self.layers)-1:-1:1
-                 self.layers{m}.sensitivity_m(self.layers{m+1}.w, self.layers{m+1}.s);
+            % then can calculate middle layers
+            for m=length(self.layers)-1:-1:2
+                 self.layers{m}.sensitivity_m(self.layers{m+1}.w, ...
+                     self.layers{m+1}.s, self.layers{m-1}.a);
             end
+            
+            % calculate first layer
+            self.layers{1}.sensitivity_m(self.layers{2}.w, ...
+                     self.layers{2}.s, p);
         end
         
         %
@@ -143,15 +147,17 @@ classdef neural_network < handle
         % SYNOPSIS train(self, epochs, training_set)
         %   the network must be initialized
         %   the number of epochs must be posative
+        %   the batch_size must be posative and less than the length of the
+        %       training_set
         %   the training set must be non-empty
         %
         % INPUT epochs: number of passes over the training set
         % INPUT batch_size: number of samples per batch
-        % INPUT neurons: training data in the format { {p t} ... } where
-        %   p & t are column vectors
+        % INPUT training_set: training data in the format { {p t} ... } 
+        %   where p & t are column vectors
         %
-        function train(self, epochs, batch_size, training_set)
-            samples=length(training_set);
+        function [mse] = train(self, epochs, batch_size, training_set)
+            samples = length(training_set);
             if ~self.initialized
                 error('not initialized')
             elseif epochs < 1 
@@ -161,19 +167,9 @@ classdef neural_network < handle
             elseif isempty(training_set)
                 error('no training set')
             end
-            
-            %todo move graphing to another location
-            % graph configuration
-            figure;
-            subplot(2, 1, 1);
-            hold on; grid on;
-            title('mean squared error:epochs')
-            xlabel('epochs')
-            ylabel('mse')
 
-            % plot data containers
+            % plot data
             mse = zeros(1, epochs);
-            x = 1:epochs;
             
             % backpropagation algorithm
             for k=1:epochs
@@ -187,23 +183,13 @@ classdef neural_network < handle
                         e = self.forward_propagation(p, t);
 
                         % step 2 & 3: back prop and set sensitivities
-                        self.backpropagate_sensitivities(e);
+                        self.backpropagate_sensitivities(e, p);
                     end
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
-                mse(k) = e'*e;
-                
+                mse(k) = e' * e; 
             end
-            
-            plot(x, mse)
-            % post-computation graph configuration
-            %legend('0', '4', '8')
-            subplot(2, 1, 2)
-            imagesc(self.layers{end}.w);
-            colormap(hsv);
-            colorbar;
-            title('final weight matrix');
         end
         
         function n_correct = evaluate(self, test_set)

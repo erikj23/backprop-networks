@@ -14,6 +14,15 @@ for i=1:samples
     sample_set{i} = {images(:, i) labels(i)};
 end
 
+% hyper-parameters
+epochs = 100;
+batch_size = length(validation_set;
+sample = sample_set{1};
+inputs = length(sample{1});
+outputs = length(sample{2});
+first_layers = [10];
+
+
 % shuffle sample order
 sample_set = sample_set(randperm(length(sample_set)));
 
@@ -22,15 +31,7 @@ testing = 0.70;
 validation = 0.30;
 testing_set = sample_set(1:samples*testing);
 validation_set = sample_set(1:samples*validation);
-
-% hyper-parameters
-epochs = 100;
-batch_size = length(validation_set);
-sample = sample_set{1};
-inputs = length(sample{1});
-outputs = length(sample{2});
-first_layers = [10];
-
+    
 for neurons=first_layers
     % pre-computation graph configuration
     figure;
