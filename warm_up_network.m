@@ -56,14 +56,16 @@ results = r.verify(test_set);
 experiments=3;
 accuracy=r.test_noisy(test_set,experiments)
 
+
 clf
 plot(accuracy,'LineWidth',1.5)
 hold on
 
 %Set Axis Ticks, Axis Labels, and Legend
-% axis([1 6 0 100])
-% x = linspace(1,7,7);
-% set(gca,'xtick',x)
+axis([0 8 0 100])
+x = linspace(0,8,3);
+set(gca,'xtick',x);
+xticklabels({'0','4','8'})
 % xticklabels({'2','3','4','5','6','7'})
 % legend('2 occluded pixels', '4 occluded pixels', '6 occluded pixels', 'location','best')
 title('Accuracy Rate for Occluded Pixels in Digits')
