@@ -23,6 +23,7 @@ classdef layer < handle
         qb; % batch accumulator for bias vector
     end
     methods
+        
         %
         % INITIALIZE initialize layer 
         %
