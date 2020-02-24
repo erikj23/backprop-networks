@@ -5,13 +5,21 @@ close all
 
 % load images & labels
 images = load_images('..\..\Downloads\train-images-idx3-ubyte');
-labels = load_labels('..\..\Downloads\train-labels-idx1-ubyte');
+number_labels = load_labels('..\..\Downloads\train-labels-idx1-ubyte');
 
-% format {{p t} ...}
+% get length
 samples = length(images);
+
+% replace digits with vectors
+vector_labels = cell(1, samples);
+for i=1:samples
+    vector_labels{i} = dec2vec(number_labels(i));
+end
+
+% convert data to the following format {{p t} ...}
 sample_set = cell(1, samples);
 for i=1:samples
-    sample_set{i} = {images(:, i) labels(i)};
+    sample_set{i} = {images(:, i) vector_labels{i}};
 end
 
 % shuffle sample order
@@ -23,15 +31,15 @@ validation = 0.30;
 testing_set = sample_set(1:samples*testing);
 validation_set = sample_set(1:samples*validation);
 
-% hyper-parameters
+% set hyper-parameters
 epochs = 100;
-batch_size = length(validation_set);
+batch_size = 100;
 sample = sample_set{1};
-inputs = length(sample{1});
-outputs = length(sample{2});
-first_layers = [10];
+input_size = length(sample{1});
+input_neurons_list = [1 10 784];
+output_neurons = length(sample{2});
 
-for neurons=first_layers
+for input_neurons=input_neurons_list
     % pre-computation graph configuration
     figure;
     subplot(2, 1, 1);
@@ -44,14 +52,14 @@ for neurons=first_layers
     r = neural_network;
     
     % first layer has inputs equivalent to input pattern
-    r.initialize(inputs, neurons, @logsig);
+    r.initialize(input_size, input_neurons, @logsig);
     
     % last layer has neurons equivalent to output target
-    r.add_layer(outputs, @purelin)
+    r.add_layer(output_neurons, @logsig)
     
-    % time the performance
+    % train & time the performance
     tic
-    mse = r.train(epochs, batch_size, validation_set);
+    mse = r.train(epochs, batch_size, training_set);
     toc
         
     % post-computation graph configuration
