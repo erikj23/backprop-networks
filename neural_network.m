@@ -26,9 +26,9 @@ classdef neural_network < handle
         %
         function initialize(self, input_size, neurons, transfer_function)
             if input_size < 1
-                error('input size must be posative')
+                error('input size must be positive')
             elseif neurons < 1
-                error('neurons must be posative')
+                error('neurons must be positive')
             end
             new_layer = layer;
             new_layer.initialize(neurons, input_size, transfer_function);
@@ -154,8 +154,8 @@ classdef neural_network < handle
         %
         % SYNOPSIS train(self, epochs, training_set)
         %   the network must be initialized
-        %   the number of epochs must be posative
-        %   the batch_size must be posative and less than the length of the
+        %   the number of epochs must be positive
+        %   the batch_size must be positive and less than the length of the
         %       training_set
         %   the training set must be non-empty
         %
@@ -169,9 +169,9 @@ classdef neural_network < handle
             if ~self.initialized
                 error('not initialized')
             elseif epochs < 1 
-                error('epochs must be posative')
+                error('epochs must be positive')
             elseif batch_size < 1 || batch_size > samples
-                error('batch must be posative & less than length of training set')
+                error('batch must be positive & less than length of training set')
             elseif isempty(training_set)
                 error('training set cannot be empty')
             end

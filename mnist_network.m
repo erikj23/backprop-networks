@@ -1,37 +1,37 @@
 
-% reset environment
+%% reset environment
 clear
 close all
 
-% load images & labels
+%% load images & labels
 images = load_images('..\..\Downloads\train-images-idx3-ubyte');
 number_labels = load_labels('..\..\Downloads\train-labels-idx1-ubyte');
 
-% get length
+%% get number of samples
 samples = length(images);
 
-% replace digits with vectors
+%% replace digits with vectors
 vector_labels = cell(1, samples);
 for i=1:samples
     vector_labels{i} = dec2vec(number_labels(i));
 end
 
-% convert data to the following format {{p t} ...}
+%% convert data to the following format {{p t} ...}
 sample_set = cell(1, samples);
 for i=1:samples
     sample_set{i} = {images(:, i) vector_labels{i}};
 end
 
-% shuffle sample order
+%% shuffle sample order
 sample_set = sample_set(randperm(length(sample_set)));
 
-% split samples into a training & validation set
+%% split samples into a training & validation set
 training = 0.70;
 validation = 0.30;
 training_set = sample_set(1:samples*training);
 validation_set = sample_set(1:samples*validation);
 
-% set hyper-parameters
+%% set hyper-parameters
 epochs = 100;
 batch_size = 100;
 sample = sample_set{1};
@@ -39,6 +39,7 @@ input_size = length(sample{1});
 input_neurons_list = [10];
 output_neurons = length(sample{2});
 
+%% train & graph results
 for input_neurons=input_neurons_list
     % pre-computation graph configuration
     figure;
