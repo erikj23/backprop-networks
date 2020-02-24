@@ -263,45 +263,42 @@ classdef neural_network < handle
         
         function accuracy_rates = test_noisy(self,test_set, experiments)
             
-            % used to store test set of corrupted images
-            corrupted_test_set=cell(size(test_set));
+            
 
             % one accuracy rate per experiment
             accuracy_rates=zeros(experiments,1); 
             
-            examples=length(test_set(1,:))
+            examples=length(test_set(1,:));
             tests=10;
             pixels=0;
-            correct=0;
-            
+      
+            % used to store test set of corrupted images
+            corrupted_test_set=cell(1,length(test_set)*tests)
+       
             
             for k=1:experiments
-                
-                for i=1:tests
+                correct=0;
+                for i=0:tests-1
                     for j=1:examples
-                        i
-                        j
-                        
+
                         % get example and ground truth
                         p=test_set{j}{1};                   
-                        t=test_set{j}{2}                    
+                        t=test_set{j}{2};                  
 
                         % add noise to test patterns
                         corrupted = add_noise(p,pixels);
-                        diff = p-corrupted;
 
                         % add corrupted sample to noisy test_set
-                        corrupted_test_set{j}{1}=corrupted;
-                        corrupted_test_set{j}{2}=t   
-                    end
-                    size(test_set);
-
-                    % test model against ground truth and record 
-                    correct=self.test(test_set);
+                        corrupted_test_set{j+(examples*i)}{1}=corrupted;
+                        corrupted_test_set{j+(examples*i)}{2}=t;   
+                    end                
                 end
-                
-               
-                accuracy_rates(k,1)=(correct/(10*examples))*100;
+                % test model against ground truth and record 
+                correct=self.test(corrupted_test_set);
+
+                accuracy=correct/(tests*examples)
+
+                accuracy_rates(k,1)=(correct/(tests*examples))*100;
                 pixels = pixels + 4;
                 
             end
