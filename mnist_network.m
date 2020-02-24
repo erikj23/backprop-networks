@@ -26,9 +26,9 @@ end
 sample_set = sample_set(randperm(length(sample_set)));
 
 % split samples into a training & validation set
-testing = 0.70;
+training = 0.70;
 validation = 0.30;
-testing_set = sample_set(1:samples*testing);
+training_set = sample_set(1:samples*training);
 validation_set = sample_set(1:samples*validation);
 
 % set hyper-parameters
@@ -36,7 +36,7 @@ epochs = 100;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [1 10 784];
+input_neurons_list = [10];
 output_neurons = length(sample{2});
 
 for input_neurons=input_neurons_list

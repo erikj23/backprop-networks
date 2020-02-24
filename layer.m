@@ -11,16 +11,18 @@
 %   qw - batch accumulator for weight matrix
 %   qb - batch accumulator for bias vector
 classdef layer < handle
-    properties%(SetAccess = 'private')        
-        w;  % weight matrix 
-        b;  % bias vector            
+    properties(Access = 'private')        
         f;  % transfer function
         df; % d/dn transfer function
+        qw; % batch accumulator for weight matrix
+        qb; % batch accumulator for bias vector
+    end
+    properties%(SetAccess = 'private')
+        w;  % weight matrix
+        b;  % bias vector
         n;  % net input
         a;  % output
         s;  % sensitivity
-        qw; % batch accumulator for weight matrix
-        qb; % batch accumulator for bias vector
     end
     methods
         

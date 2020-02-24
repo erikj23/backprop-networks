@@ -7,9 +7,9 @@ classdef neural_network < handle
 
     properties(Access='private')
         initialized = false;
+        alpha = 0.1;
     end 
     properties%(SetAccess='private')
-        alpha = 0.1;
         layers = {};
     end 
     
@@ -19,11 +19,17 @@ classdef neural_network < handle
         % INITIALIZE sets first layer of network
         %
         % SYNOPSIS initialize(self, inputs, neurons, transfer_function)
+        % 
         % INPUT input_size: length of initial input vector
         % INPUT neurons: desired neurons in layer
         % INPUT transfer_function: transfer_function for layer
         %
         function initialize(self, input_size, neurons, transfer_function)
+            if input_size < 1
+                error('input size must be posative')
+            elseif neurons < 1
+                error('neurons must be posative')
+            end
             new_layer = layer;
             new_layer.initialize(neurons, input_size, transfer_function);
             self.layers{end + 1} = new_layer;
@@ -70,7 +76,7 @@ classdef neural_network < handle
             if ~self.initialized
                 error('not intialized')
             elseif length(neurons_list) ~= length(transfer_function_list)
-                error('# of neurons != # of functions')
+                error('size of neurons != functions')
             end
             
             % add a layer
@@ -106,6 +112,7 @@ classdef neural_network < handle
         % SYNOPSIS backpropagate_sensitivities(self, e)
         %
         % INPUT e: error at last layer
+        % INPUT p: a0 = p
         %
         function backpropagate_sensitivities(self, e, p)
             % calculate last layer
@@ -117,7 +124,7 @@ classdef neural_network < handle
                      self.layers{m+1}.s, self.layers{m-1}.a);
             end
             
-            % calculate first layer
+            % calculate first layer, a0 = p
             self.layers{1}.sensitivity_m(self.layers{2}.w, ...
                      self.layers{2}.s, p);
         end
@@ -127,7 +134,8 @@ classdef neural_network < handle
         %
         % SYNOPSIS update_layers(self, p)
         %
-        % INPUT p: pattern
+        % INPUT p: a0 = p
+        % INPUT batch_size: number of samples per batch
         %
         function update_layers(self, p, batch_size)
             % m >= 2 so that m-1 != 0
@@ -161,11 +169,11 @@ classdef neural_network < handle
             if ~self.initialized
                 error('not initialized')
             elseif epochs < 1 
-                error('no epochs')
+                error('epochs must be posative')
             elseif batch_size < 1 || batch_size > samples
-                error('batch size invalid')
+                error('batch must be posative & less than length of training set')
             elseif isempty(training_set)
-                error('no training set')
+                error('training set cannot be empty')
             end
 
             % plot data
