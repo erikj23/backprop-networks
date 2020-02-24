@@ -58,7 +58,7 @@ accuracy=r.test_noisy(test_set,experiments)
 
 
 clf
-plot(accuracy,'LineWidth',1.5)
+plot([0, 4, 8], accuracy,'LineWidth',1.5)
 hold on
 
 %Set Axis Ticks, Axis Labels, and Legend
