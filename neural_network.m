@@ -191,12 +191,35 @@ classdef neural_network < handle
             end
         end
         
+        
+        function predictions = classify(self, a, n_examples)
+            
+            predictions=zeros(n_examples);    % vector to store values for final output
+            max=0;
+            predicted=-1;
+            % Iterate through output layer neurons and 
+            % choose maximum of neurons as network's
+            % prediction
+            
+            for i=1:length(a)
+                % determine network prediction for test example
+                if a(i,1)>max
+                  max=a(i,1);
+                  predicted=i-1;
+                end
+            end
+            
+            % Store network's decision
+            predictions(predicted+1,1)=1;
+            
+        end
+        
         function n_correct = test(self, test_set)
             n_correct=0;
 
             for sample=1:length(test_set)
-                predicted=-1;                               % activated neuron in final layer
-                predictions=zeros(size(test_set{1}{2}));    % vector to store values for final output
+%                 predicted=-1;                               % activated neuron in final layer
+%                 predictions=zeros(size(test_set{1}{2}));    % vector to store values for final output
                 max=0;                                      % used to track max 
                 p=test_set{sample}{1};                      % input of test_set
                 t=test_set{sample}{2};                      % expected output of test_set
@@ -204,11 +227,11 @@ classdef neural_network < handle
                 % Push test example through network
                 e=self.forward_propagation(p, t);
                 a=self.layers{end}.a;
-
-
-                % Iterate through output layer neurons and 
-                % choose maximum of neurons as network's
-                % prediction
+% 
+% 
+%                 % Iterate through output layer neurons and 
+%                 % choose maximum of neurons as network's
+%                 % prediction
                 for i=1:length(a)
 
                     % determine network prediction for test example
@@ -220,8 +243,10 @@ classdef neural_network < handle
                 end
 
                  % network output
-                 predictions(predicted+1,1)=1;
-
+%                  predictions(predicted+1,1)=1;
+                 
+                 predictions=self.classify(a,size(test_set{1}{2}));
+%                  size(predictions)
                  % record network accuracy
                  n_correct = n_correct + isequal(predictions,t);
             end
@@ -263,8 +288,6 @@ classdef neural_network < handle
         
         function accuracy_rates = test_noisy(self,test_set, experiments)
             
-            
-
             % one accuracy rate per experiment
             accuracy_rates=zeros(experiments,1); 
             
