@@ -210,32 +210,66 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                e=forward_propagation(p, t);
+                e=self.forward_propagation(p, t);
+                a=self.layers{end}.a;
+
+
+                % Iterate through output layer neurons and 
+                % choose maximum of neurons as network's
+                % prediction
+                for i=1:length(a)
+
+                    % determine network prediction for test example
+                    if a(i,1)>max
+                      max=a(i,1);
+                      predicted=i-1;
+
+                    end
+                end
+
+                 % network output
+                 predictions(predicted+1,1)=1;
+
+                 % record network accuracy
+                 n_correct = n_correct + isequal(predictions,t);
+            end
+        end
+        
+        
+        function result_set = verify(self, test_set)    
+            result_set=cell(size(test_set));
+
+            for sample=1:length(test_set)
+                predicted=-1;                               % activated neuron in final layer
+                predictions=zeros(size(test_set{1}{2}));    % vector to store values for final output
+                max=0;                                      % used to track max 
+                p=test_set{sample}{1};                      % input of test_set
+                t=test_set{sample}{2};                      % expected output of test_set
+
+                % Push test example through network
+                e=self.forward_propagation(p, t);
                 a=self.layers{end}.a;
 
                 % Iterate through output layer neurons and 
                 % choose maximum of neurons as network's
                 % prediction
                 for i=1:length(a)
-                 i
-                 a(i,1)
                     % determine network prediction for test example
                     if a(i,1)>max
                       max=a(i,1);
-                      predicted=i-1
+                      predicted=i-1;
 
                     end
                 end
-                 t
                  % network output
-                 predictions(predicted+1,1)=1
-
-                 % record network accuracy
-                 n_correct = n_correct + isequal(predictions,t)
+                 predictions(predicted+1,1)=1;
+                 
+                 result_set{sample}{1}=predictions;
+                 result_set{sample}{2}=t;
             end
         end
         
-        function accuracy_rates = test_noisy(test_set, experiments)
+        function accuracy_rates = test_noisy(self,test_set, experiments)
             
             % used to store test set of corrupted images
             corrupted_test_set=cell(size(test_set));
@@ -248,28 +282,35 @@ classdef neural_network < handle
             pixels=0;
             correct=0;
             
+            
             for k=1:experiments
+                
                 for i=1:tests
                     for j=1:examples
-                        
+                        i
+                        j
                         
                         % get example and ground truth
-                        p=test_set{j}{1};                      
-                        t=test_set{j}{2};                     
+                        p=test_set{j}{1};                   
+                        t=test_set{j}{2}                    
 
                         % add noise to test patterns
-                        corrupted = addNoise(p(:,j),pixels);
+                        corrupted = add_noise(p,pixels);
+                        diff = p-corrupted;
 
                         % add corrupted sample to noisy test_set
                         corrupted_test_set{j}{1}=corrupted;
-                        corrupted_test_set{j}{2}=t;   
+                        corrupted_test_set{j}{2}=t   
                     end
+                    size(test_set);
 
                     % test model against ground truth and record 
-                    correct=test(test_set);
+                    correct=self.test(test_set);
                 end
+                
                
                 accuracy_rates(k,1)=(correct/(10*examples))*100;
+                pixels = pixels + 4;
                 
             end
 
