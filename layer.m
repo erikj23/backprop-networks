@@ -3,11 +3,11 @@
 % PROPERTIES
 %   w - weight matrix 
 %   b - bias vector            
-%   f - transfer function
-%   df - d/dn of transfer function
 %   n - net input
 %   a - output
 %   s - sensitivity
+%   f - transfer function
+%   df - d/dn of transfer function
 %   qw - batch accumulator for weight matrix
 %   qb - batch accumulator for bias vector
 classdef layer < handle
@@ -93,6 +93,7 @@ classdef layer < handle
         %   sets s locally for later use
         %
         % INPUT e: error at final layer (from forward propagation)
+        % INPUT prev_a: sensitivity s(m+1)
         %
         function sensitivity_M(self, e, prev_a)
             % chapter 11 example uses purelin, so d/dn = 1, parameters = 0
@@ -116,6 +117,7 @@ classdef layer < handle
         %
         % INPUT next_w: weight matrix w(m+1)
         % INPUT next_s: sensitivity s(m+1)
+        % INPUT prev_a: sensitivity s(m+1)
         %
         function sensitivity_m(self, next_w, next_s, prev_a)
             % s = old s + new s, call to update sets to 0, for batch size 1
