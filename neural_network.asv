@@ -63,8 +63,8 @@ classdef neural_network < handle
         %
         % INPUT neurons_list: desired neurons in layer in vector format 
         %   [x ...] where x is a whole number
-        % INPUT transfer_function_list: transfer_function for layer in 
-        %   vector format [x ...] where x is a function handle(ex. @logsig)
+        % INPUT transfer_function: transfer_function for layer in vector
+        %   format [x ...] where x is a function handle (ex. @logsig)
         %   
         function add_layers(self, neurons_list, transfer_function_list)
             if ~self.initialized
@@ -175,6 +175,7 @@ classdef neural_network < handle
             for k=1:epochs
                 for sample=1:batch_size:samples
                     for job=0:batch_size-1
+                        %sample+job
                         p = training_set{sample+job}{1};
                         t = training_set{sample+job}{2};
 
