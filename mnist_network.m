@@ -36,7 +36,7 @@ epochs = 100;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [1 3 5];
+input_neurons_list = [1 3 5 7 10 100];
 output_neurons = length(sample{2});
 
 %% train & graph results

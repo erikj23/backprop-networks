@@ -54,8 +54,7 @@ results = r.verify(test_set);
 
 %%  Plot accuracy rates for noisy digits
 experiments=3;
-accuracy=r.test_noisy(test_set,experiments)
-
+accuracy=r.test_noisy(test_set,experiments);
 
 clf
 plot([0, 4, 8], accuracy,'LineWidth',1.5)

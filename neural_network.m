@@ -200,7 +200,7 @@ classdef neural_network < handle
         end
         
         
-        function predictions = classify(self, a, n_examples)
+        function predictions = classify(~, a, n_examples)
             
             predictions=zeros(n_examples);    % vector to store values for final output
             max=0;
@@ -233,7 +233,7 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                e=self.forward_propagation(p, t);
+                self.forward_propagation(p, t);
                 a=self.layers{end}.a;
 % 
 % 
@@ -245,8 +245,6 @@ classdef neural_network < handle
                     % determine network prediction for test example
                     if a(i,1)>max
                       max=a(i,1);
-                      predicted=i-1;
-
                     end
                 end
 
@@ -272,7 +270,7 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                e=self.forward_propagation(p, t);
+                self.forward_propagation(p, t);
                 a=self.layers{end}.a;
 
                 % Iterate through output layer neurons and 
@@ -298,17 +296,14 @@ classdef neural_network < handle
             
             % one accuracy rate per experiment
             accuracy_rates=zeros(experiments,1); 
-            
             examples=length(test_set(1,:));
             tests=10;
             pixels=0;
       
             % used to store test set of corrupted images
-            corrupted_test_set=cell(1,length(test_set)*tests)
-       
+            corrupted_test_set=cell(1,length(test_set)*tests);
             
             for k=1:experiments
-                correct=0;
                 for i=0:tests-1
                     for j=1:examples
 
@@ -326,14 +321,9 @@ classdef neural_network < handle
                 end
                 % test model against ground truth and record 
                 correct=self.test(corrupted_test_set);
-
-                accuracy=correct/(tests*examples)
-
                 accuracy_rates(k,1)=(correct/(tests*examples))*100;
                 pixels = pixels + 4;
-                
             end
-
         end
     end
 end
