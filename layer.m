@@ -93,18 +93,17 @@ classdef layer < handle
         %   sets s locally for later use
         %
         % INPUT e: error at final layer (from forward propagation)
-        % INPUT prev_a: sensitivity s(m+1)
+        % INPUT prev_a: output a(m-1) for batch computation
         %
         function sensitivity_M(self, e, prev_a)
-            % chapter 11 example uses purelin, so d/dn = 1, parameters = 0
-            % checking number of parameters with nargin
-            % s = old s + new s, call to update sets to 0, for batch size 1
-            %   call is equivalent to s = 0 + new s
+            % for validate network, params almost always > 0
             if nargin(self.df)
                 self.s = (-2) * self.df(self.n) .* e;
             else
                 self.s = (-2) * self.df() .* e;
             end
+            
+            % accumulate batch sensitivity
             self.qw = self.qw + self.s * prev_a';
             self.qb = self.qb + self.s;
         end
@@ -117,12 +116,12 @@ classdef layer < handle
         %
         % INPUT next_w: weight matrix w(m+1)
         % INPUT next_s: sensitivity s(m+1)
-        % INPUT prev_a: sensitivity s(m+1)
+        % INPUT prev_a: output a(m-1) for batch computation
         %
         function sensitivity_m(self, next_w, next_s, prev_a)
-            % s = old s + new s, call to update sets to 0, for batch size 1
-            %   call is equivalent to s = 0 + new s
             self.s = self.df(self.n) .* next_w' * next_s;
+            
+            % accumulate batch sensitivity
             self.qw = self.qw + self.s * prev_a';
             self.qb = self.qb + self.s;
         end
@@ -141,7 +140,7 @@ classdef layer < handle
                 self.w = self.w - (alpha * self.qw / batch_size);
                 self.b = self.b - (alpha * self.qb / batch_size);
                 
-                % reset batch accumulator on update
+                % reset batch accumulators on update
                 self.qw = 0;
                 self.qb = 0;
             else

@@ -195,7 +195,7 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
-                mse(k) = e' * e; 
+                mse(k)=e'*e;
             end
         end
         

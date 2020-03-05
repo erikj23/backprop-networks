@@ -36,7 +36,7 @@ epochs = 100;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [1 3 5 7 10 100];
+input_neurons_list = [10];
 output_neurons = length(sample{2});
 
 %% train & graph results
@@ -54,7 +54,7 @@ for input_neurons=input_neurons_list
     
     % first layer has inputs equivalent to input pattern
     r.initialize(input_size, input_neurons, @logsig);
-    
+    %r.add_layer(10, @logsig)
     % last layer has neurons equivalent to output target
     r.add_layer(output_neurons, @logsig)
     
