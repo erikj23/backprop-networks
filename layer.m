@@ -41,16 +41,18 @@ classdef layer < handle
         %
         function initialize(self, neurons, inputs, transfer_function)
             syms x;
-            self.f = transfer_function;
+            self.f=transfer_function;
             
             % computing derivative of transfer function
-            self.df = matlabFunction(diff(transfer_function(x)));
+            self.df=matlabFunction(diff(transfer_function(x)));
             
             % create initial matrix with values between [-1, 1]
+            %self.w = gpuArray((rand(neurons, inputs) - 0.5) * 2);
+            %self.b = gpuArray((rand(neurons, 1) - 0.5) * 2);
             self.w = (rand(neurons, inputs) - 0.5) * 2;
             self.b = (rand(neurons, 1) - 0.5) * 2;
             
-            % initialize net input and output and sensitivity
+            % initialize data and move to gpu
             self.n = 0;
             self.a = 0;
             self.s = 0;
@@ -119,7 +121,8 @@ classdef layer < handle
         % INPUT prev_a: output a(m-1) for batch computation
         %
         function sensitivity_m(self, next_w, next_s, prev_a)
-            self.s = self.df(self.n) .* next_w' * next_s;
+            %self.s = self.df(self.n) .* next_w' * next_s;
+            self.s = (1-self.a) .* self.a .* next_w' * next_s;
             
             % accumulate batch sensitivity
             self.qw = self.qw + self.s * prev_a';

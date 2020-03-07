@@ -8,6 +8,7 @@ classdef neural_network < handle
     properties(Access='private')
         initialized = false;
         alpha = 0.1;
+        %alpha = gpuArray(0.1);
     end 
     properties%(SetAccess='private')
         layers = {};
@@ -176,7 +177,8 @@ classdef neural_network < handle
                 error('training set cannot be empty')
             end
 
-            % plot data
+            % plot data container moved to gpu
+            %mse = gpuArray(zeros(1, epochs));
             mse = zeros(1, epochs);
             
             % backpropagation algorithm
@@ -195,8 +197,11 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
-                mse(k)=e'*e;
+                mse(k) = e' * e;
             end
+            
+            % plot data container retrieved from gpu
+            %mse = gather(mse);
         end
         
         

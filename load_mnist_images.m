@@ -1,4 +1,4 @@
-function images = load_images(filename)
+function images = load_mnist_images(filename)
 %loadMNISTImages returns a 28x28x[number of MNIST images] matrix containing
 %the raw MNIST images
 
@@ -14,7 +14,7 @@ columns = fread(fp, 1, 'int32', 0, 'ieee-be');
 
 images = fread(fp, inf, 'unsigned char');
 images = reshape(images, columns, rows, image_count);
-images = permute(images,[2 1 3]);
+images = permute(images, [2 1 3]);
 
 fclose(fp);
 
