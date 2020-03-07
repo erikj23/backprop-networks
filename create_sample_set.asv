@@ -22,6 +22,7 @@ function [sample_set, samples] = create_sample_set(filename)
     
     %% restore data in into matrices for gpu operations
     labels_matrix=zeros(size(sample_set{1}{2}, 1), samples);
+    
     for i=1:samples
         p = sample_set{i}{1};
         t = sample_set{i}{2};

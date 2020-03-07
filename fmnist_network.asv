@@ -4,7 +4,7 @@ clear
 close all
 
 %% load images, labels, & perform preprocessing
-[sample_set, samples] = create_sample_set('../../Downloads/FMNIST/train.csv');
+[sample_set, samples] = create_sample_set('../../downloads/FMNIST/train.csv');
 
 %% split samples into a training & validation set
 training = samples*0.70;
@@ -57,11 +57,8 @@ end
 accuracy = r.test(validation_set) / validation * 100;
 
 %% finish with testing if validation was decent
-[ids, images, samples] = load_fmnist_tests('../../Downloads/FMNIST/test.csv');
+[ids, images] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
 predictions = r.kaggle(images);
-output=table(ids', predictions');
-output.Properties.VariableNames = {'Id' 'label'};
-writetable(output)
 if accuracy > 80
     disp 'over 9000'
 else

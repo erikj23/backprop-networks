@@ -210,11 +210,12 @@ classdef neural_network < handle
         % 
         % INPUT test_set: training data in the format { p ... }
         %
-        function [] = kaggle(self, test_ids, test_images, samples)
-            ouput = '~/kaggle.csv';
-            for sample=samples
-                a = self.forward_propagation(sample);
-                
+        function [predictions] = kaggle(self, images)
+            samples = length(images);
+            predictions = zeros(1, samples);
+            for sample=1:samples
+                a = self.forward_propagation(images(sample));
+                predictions(sample) = vec2ind(a) - 1;
             end
         end
         
@@ -251,7 +252,7 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                self.forward_propagation(p, t);
+                self.forward_propagation(p);
                 a=self.layers{end}.a;
 % 
 % 
@@ -288,7 +289,7 @@ classdef neural_network < handle
                 t=test_set{sample}{2};                      % expected output of test_set
 
                 % Push test example through network
-                self.forward_propagation(p, t);
+                self.forward_propagation(p);
                 a=self.layers{end}.a;
 
                 % Iterate through output layer neurons and 
