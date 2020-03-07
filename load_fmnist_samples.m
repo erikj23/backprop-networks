@@ -1,7 +1,7 @@
 function [images, labels] = load_fmnist_samples(filename)
     % read matrix into memory and transpose
     data = readmatrix(filename)';
-    
+   
     % row 2 contains the labels
     labels = data(2, :);
     

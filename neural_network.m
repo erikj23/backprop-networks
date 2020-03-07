@@ -210,11 +210,14 @@ classdef neural_network < handle
         % 
         % INPUT test_set: training data in the format { p ... }
         %
-        %function [] = kaggle(self, test_ids, test_images, samples, output)
-        %    for sample=samples
-        %        self.forward_propagation(sample);
-        %    end
-        %end
+        function [predictions] = kaggle(self, images)
+            samples = length(images);
+            predictions = zeros(1, samples);
+            for sample=1:samples
+                a = self.forward_propagation(images(:, sample));
+                predictions(sample) = vec2ind(a) - 1;
+            end
+        end
         
         function predictions = classify(~, a, n_examples)
             
