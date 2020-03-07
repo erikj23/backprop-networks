@@ -1,4 +1,4 @@
-function labels = load_labels(filename)
+function labels = load_mnist_labels(filename)
 %loadMNISTLabels returns a [number of MNIST images]x1 matrix containing
 %the labels for the MNIST images
 

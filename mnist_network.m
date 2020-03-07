@@ -4,8 +4,8 @@ clear
 close all
 
 %% load images & labels
-images = load_images('..\..\Downloads\train-images-idx3-ubyte');
-number_labels = load_labels('..\..\Downloads\train-labels-idx1-ubyte');
+images = load_mnist_images('~/B/downloads/train-images-idx3-ubyte');
+digit_labels = load_mnist_labels('~/B/downloads/train-labels-idx1-ubyte');
 
 %% get number of samples
 samples = length(images);
@@ -13,7 +13,7 @@ samples = length(images);
 %% replace digits with vectors
 vector_labels = cell(1, samples);
 for i=1:samples
-    vector_labels{i} = dec2vec(number_labels(i));
+    vector_labels{i} = dec2vec(digit_labels(i));
 end
 
 %% convert data to the following format {{p t} ...}
@@ -32,7 +32,7 @@ training_set = sample_set(1:samples*training);
 validation_set = sample_set(1:samples*validation);
 
 %% set hyper-parameters
-epochs = 100;
+epochs = 10;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
@@ -49,7 +49,7 @@ for input_neurons=input_neurons_list
     xlabel('epochs')
     ylabel('mse')
     
-    % create & train a network
+    % create a network
     r = neural_network;
     
     % first layer has inputs equivalent to input pattern
