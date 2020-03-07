@@ -4,20 +4,20 @@ clear
 close all
 
 %% load images, labels, & perform preprocessing
-sample_set = create_samples('~/B/downloads/FMNIST/train.csv');
+[sample_set, samples] = create_sample_set('../../Downloads/FMNIST/train.csv');
 
 %% split samples into a training & validation set
-training = 0.70;
-validation = 0.30;
-training_set = sample_set(1:samples*training);
-validation_set = sample_set(1:samples*validation);
+training = samples*0.70;
+validation = samples*0.30;
+training_set = sample_set(1:training);
+validation_set = sample_set(training:training+validation);
 
 %% set hyper-parameters
-epochs = 100;
+epochs = 1;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [100];
+input_neurons_list = [10];
 output_neurons = length(sample{2});
 
 %% train & graph results
@@ -54,6 +54,12 @@ for input_neurons=input_neurons_list
 end
 
 %% follow up with validation
-r.test(validation_set)
+accuracy = r.test(validation_set) / validation * 100;
 
-% 
+%% finish with testing if validation was decent
+
+if accuracy > 80
+    disp 'over 9000'
+else
+    disp 'lower class saiyan'
+end

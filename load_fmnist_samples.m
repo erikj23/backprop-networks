@@ -1,4 +1,4 @@
-function [images, labels] = load_fmnist(filename)
+function [images, labels] = load_fmnist_samples(filename)
     % read matrix into memory and transpose
     data = readmatrix(filename)';
     

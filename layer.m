@@ -122,7 +122,7 @@ classdef layer < handle
         %
         function sensitivity_m(self, next_w, next_s, prev_a)
             %self.s = self.df(self.n) .* next_w' * next_s;
-            self.s = (1-self.a) .* self.a .* next_w' * next_s;
+            self.s = (1 - self.a) .* self.a .* next_w' * next_s;
             
             % accumulate batch sensitivity
             self.qw = self.qw + self.s * prev_a';
