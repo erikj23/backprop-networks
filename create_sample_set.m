@@ -1,6 +1,6 @@
-function [sample_set] = create_samples(filename)
+function [sample_set, samples] = create_sample_set(filename)
     %% load images & labels
-    [images, digit_labels] = load_fmnist(filename);
+    [images, digit_labels] = load_fmnist_samples(filename);
 
     %% get number of samples
     samples = length(images);
