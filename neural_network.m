@@ -8,7 +8,7 @@ classdef neural_network < handle
     properties(Access='private')
         initialized = false;
         alpha = 0.1;
-        %alpha = gpuArray(0.1);
+        %zalpha = gpuArray(0.1);
     end 
     properties%(SetAccess='private')
         layers = {};

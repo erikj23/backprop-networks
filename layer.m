@@ -47,10 +47,10 @@ classdef layer < handle
             self.df=matlabFunction(diff(transfer_function(x)));
             
             % create initial matrix with values between [-1, 1]
-            self.w = gpuArray((rand(neurons, inputs) - 0.5) * 2);
-            self.b = gpuArray((rand(neurons, 1) - 0.5) * 2);
-            %self.w = (rand(neurons, inputs) - 0.5) * 2;
-            %self.b = (rand(neurons, 1) - 0.5) * 2;
+            %self.w = gpuArray((rand(neurons, inputs) - 0.5) * 2);
+            %self.b = gpuArray((rand(neurons, 1) - 0.5) * 2);
+            self.w = (rand(neurons, inputs) - 0.5) * 2;
+            self.b = (rand(neurons, 1) - 0.5) * 2;
             
             % initialize data and move to gpu
             self.n = 0;
