@@ -13,11 +13,11 @@ training_set = sample_set(1:training);
 validation_set = sample_set(training:training+validation);
 
 %% set hyper-parameters
-epochs = 100;
+epochs = 1;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [100];
+input_neurons_list = [10];
 output_neurons = length(sample{2});
 
 %% train & graph results
@@ -41,7 +41,7 @@ for input_neurons=input_neurons_list
     
     % train & time the performance
     tic
-    mse = r.train(epochs, batch_size, sample_set);
+    mse = r.train(epochs, batch_size, training_set);
     toc
     
     % post-computation graph configuration
@@ -61,8 +61,7 @@ accuracy = r.test(validation_set) / validation * 100;
 predictions = r.kaggle(images);
 output=table(ids', predictions');
 output.Properties.VariableNames = {'Id' 'label'};
-writetable(output);
-
+writetable(output)
 if accuracy > 80
     disp 'over 9000'
 else
