@@ -10,10 +10,10 @@ close all
 training = samples*0.70;
 validation = samples*0.30;
 training_set = sample_set(1:training);
-validation_set = sample_set(training:training+validation);
+validation_set = sample_set(training+1:training+validation);
 
 %% set hyper-parameters
-epochs = 1;
+epochs = 10;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
@@ -34,7 +34,7 @@ for input_neurons=input_neurons_list
     r = neural_network;
     
     % first layer has inputs equivalent to input pattern
-    r.initialize(input_size, input_neurons, @logsig);
+    r.initialize(input_size, input_neurons, @logsig, true);
     %r.add_layer(10, @logsig)
     % last layer has neurons equivalent to output target
     r.add_layer(output_neurons, @logsig)

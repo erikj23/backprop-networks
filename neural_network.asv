@@ -6,9 +6,11 @@
 classdef neural_network < handle
 
     properties(Access='private')
+        test_kernel = [0 1 0; 1 -4 1; 0 1 0];
         initialized = false;
+        convolution = false;
         alpha = 0.1;
-        %alpha = gpuArray(0.1);
+        %zalpha = gpuArray(0.1);
     end 
     properties%(SetAccess='private')
         layers = {};
@@ -25,16 +27,20 @@ classdef neural_network < handle
         % INPUT neurons: desired neurons in layer
         % INPUT transfer_function: transfer_function for layer
         %
-        function initialize(self, input_size, neurons, transfer_function)
+        function initialize(self, input_size, neurons, transfer_function, convolve)
             if input_size < 1
                 error('input size must be positive')
             elseif neurons < 1
                 error('neurons must be positive')
             end
-            new_layer = layer;
+            if convolve
+                input_size=length(self.convolve(
+            end
+            new_layer = layer;            
             new_layer.initialize(neurons, input_size, transfer_function);
             self.layers{end + 1} = new_layer;
             self.initialized = true;
+            
         end
         
         %
@@ -214,7 +220,7 @@ classdef neural_network < handle
             samples = length(images);
             predictions = zeros(1, samples);
             for sample=1:samples
-                a = self.forward_propagation(images(sample));
+                a = self.forward_propagation(images(:, sample));
                 predictions(sample) = vec2ind(a) - 1;
             end
         end
@@ -343,6 +349,23 @@ classdef neural_network < handle
                 accuracy_rates(k,1)=(correct/(tests*examples))*100;
                 pixels = pixels + 4;
             end
+        end
+        function [conv_p] = convolve(self, p)
+            % convert vector to matrix
+            mat_p = vec2mat(p, 28);
+            
+            % convolve p with kernel
+            conv_p = conv2(mat_p, self.test_kernel, 'valid');
+            
+            % normalize values to [0-1]
+            norm_p = conv_p - min(conv_p(:));
+            norm_p = norm_p ./ max(norm_p(:));
+            
+            % maxpool
+            scale=length(norm_p)/2;
+            idx=kron(reshape(1:(scale^2), scale, []).', ones(2));
+            maxpool = reshape(accumarray(idx(:), norm_p(:), [], @max), scale, []).';
+            conv_p = maxpool(:);
         end
     end
 end

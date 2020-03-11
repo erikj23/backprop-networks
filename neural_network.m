@@ -6,7 +6,9 @@
 classdef neural_network < handle
 
     properties(Access='private')
+        test_kernel = [0 1 0; 1 -4 1; 0 1 0];
         initialized = false;
+        conv = false;
         alpha = 0.1;
         %zalpha = gpuArray(0.1);
     end 
@@ -25,16 +27,20 @@ classdef neural_network < handle
         % INPUT neurons: desired neurons in layer
         % INPUT transfer_function: transfer_function for layer
         %
-        function initialize(self, input_size, neurons, transfer_function)
+        function initialize(self, input_size, neurons, transfer_function, conv)
             if input_size < 1
                 error('input size must be positive')
             elseif neurons < 1
                 error('neurons must be positive')
             end
-            new_layer = layer;
+            if conv
+                input_size=((sqrt(input_size) - 2) / 2) ^ 2;
+            end
+            new_layer = layer;            
             new_layer.initialize(neurons, input_size, transfer_function);
             self.layers{end + 1} = new_layer;
             self.initialized = true;
+            self.conv = conv;
         end
         
         %
@@ -187,7 +193,11 @@ classdef neural_network < handle
                     for job=0:batch_size-1
                         p = training_set{sample+job}{1};
                         t = training_set{sample+job}{2};
-
+                        
+                        if self.conv
+                            p=self.convolve(p);
+                        end
+                        
                         % step 1: forward prop and get error
                         a = self.forward_propagation(p);
                         e = t - a;
@@ -214,66 +224,27 @@ classdef neural_network < handle
             samples = length(images);
             predictions = zeros(1, samples);
             for sample=1:samples
-                a = self.forward_propagation(images(:, sample));
+                p=images(:, sample);
+                if self.conv
+                    p=self.convolve(p);
+                end
+                a = self.forward_propagation(p);
                 predictions(sample) = vec2ind(a) - 1;
             end
-        end
-        
-        function predictions = classify(~, a, n_examples)
-            
-            predictions=zeros(n_examples);    % vector to store values for final output
-            max=0;
-            predicted=-1;
-            % Iterate through output layer neurons and 
-            % choose maximum of neurons as network's
-            % prediction
-            
-            for i=1:length(a)
-                % determine network prediction for test example
-                if a(i,1)>max
-                  max=a(i,1);
-                  predicted=i-1;
-                end
-            end
-            
-            % Store network's decision
-            predictions(predicted+1,1)=1;
-            
-        end
+        end     
         
         function n_correct = test(self, test_set)
             n_correct=0;
-
+            
             for sample=1:length(test_set)
-%                 predicted=-1;                               % activated neuron in final layer
-%                 predictions=zeros(size(test_set{1}{2}));    % vector to store values for final output
-                max=0;                                      % used to track max 
-                p=test_set{sample}{1};                      % input of test_set
-                t=test_set{sample}{2};                      % expected output of test_set
+                p=test_set{sample}{1};
+                t=test_set{sample}{2};
 
-                % Push test example through network
-                self.forward_propagation(p);
-                a=self.layers{end}.a;
-% 
-% 
-%                 % Iterate through output layer neurons and 
-%                 % choose maximum of neurons as network's
-%                 % prediction
-                for i=1:length(a)
-
-                    % determine network prediction for test example
-                    if a(i,1)>max
-                      max=a(i,1);
-                    end
+                if self.conv
+                    p=self.convolve(p);
                 end
-
-                 % network output
-%                  predictions(predicted+1,1)=1;
-                 
-                 predictions=self.classify(a,size(test_set{1}{2}));
-%                  size(predictions)
-                 % record network accuracy
-                 n_correct = n_correct + isequal(predictions,t);
+                a = self.forward_propagation(p);
+                n_correct = n_correct + isequal(compet(a), t);
             end
         end
         
@@ -343,6 +314,24 @@ classdef neural_network < handle
                 accuracy_rates(k,1)=(correct/(tests*examples))*100;
                 pixels = pixels + 4;
             end
+        end
+        
+        function [conv_p] = convolve(self, p)
+            % convert vector to matrix
+            mat_p = vec2mat(p, 28);
+            
+            % convolve p with kernel
+            conv_p = conv2(mat_p, self.test_kernel, 'valid');
+            
+            % normalize values to [0-1]
+            norm_p = conv_p - min(conv_p(:));
+            norm_p = norm_p ./ max(norm_p(:));
+            
+            % maxpool
+            scale=length(norm_p)/2;
+            idx=kron(reshape(1:(scale^2), scale, []).', ones(2));
+            maxpool = reshape(accumarray(idx(:), norm_p(:), [], @max), scale, []).';
+            conv_p = maxpool(:);
         end
     end
 end
