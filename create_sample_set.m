@@ -14,7 +14,14 @@ function [sample_set, samples] = create_sample_set(filename)
     %% bind p-t to the following format {{p t} ...}
     sample_set = cell(1, samples);
     for i=1:samples
-        sample_set{i} = {images(:, i) labels_cell{i}};
+        p = images(:, i);
+        t = labels_cell{i};
+        
+        % normalize input vector
+        norm_p = p - min(p(:));
+        p = norm_p ./ max(norm_p(:));
+        
+        sample_set{i} = {p t};
     end
 
     %% shuffle sample order

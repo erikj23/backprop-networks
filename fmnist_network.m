@@ -54,16 +54,12 @@ for input_neurons=input_neurons_list
 end
 
 %% follow up with validation
-accuracy = r.test(validation_set) / validation * 100;
+accuracy_t = r.test(training_set) / training * 100;
+accuracy_v = r.test(validation_set) / validation * 100;
 
 %% finish with testing if validation was decent
 [ids, images, samples] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
 predictions = r.kaggle(images);
 output=table(ids', predictions');
 output.Properties.VariableNames = {'Id' 'label'};
-writetable(output)
-if accuracy > 80
-    disp 'over 9000'
-else
-    disp 'lower class saiyan'
-end
+writetable(output, sprintf('%sE%d-B%d-L%d-A%0.2f.csv', 'x', epochs, batch_size, length(r.layers), r.alpha))
