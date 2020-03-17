@@ -1,4 +1,4 @@
 .asv
 .DS*
-*.csv
-*.txt
+.csv
+.txt
