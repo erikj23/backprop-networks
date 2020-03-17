@@ -10,60 +10,54 @@ close all
 training = samples*0.70;
 validation = samples*0.30;
 training_set = sample_set(1:training);
-validation_set = sample_set(training:training+validation);
+validation_set = sample_set(training+1:training+validation);
 
 %% set hyper-parameters
 epochs = 1;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [10];
+input_neurons = 100;
 output_neurons = length(sample{2});
 
 %% train & graph results
-for input_neurons=input_neurons_list
-    % pre-computation graph configuration
-    figure;
-    subplot(2, 1, 1);
-    hold on; grid on;
-    title('mean squared error:epochs')
-    xlabel('epochs')
-    ylabel('mse')
-    
-    % create a network
-    r = neural_network;
-    
-    % first layer has inputs equivalent to input pattern
-    r.initialize(input_size, input_neurons, @logsig);
-    %r.add_layer(10, @logsig)
-    % last layer has neurons equivalent to output target
-    r.add_layer(output_neurons, @logsig)
-    
-    % train & time the performance
-    tic
-    mse = r.train(epochs, batch_size, training_set);
-    toc
-    
-    % post-computation graph configuration
-    plot(1:epochs, mse)
-    subplot(2, 1, 2)
-    imagesc(r.layers{end}.w);
-    colormap(hsv);
-    colorbar;
-    title('final weight matrix');
-end
+% pre-computation graph configuration
+figure;
+subplot(2, 1, 1);
+hold on; grid on;
+title('mean squared error:epochs')
+xlabel('epochs')
+ylabel('mse')
+
+% create a network
+r = neural_network;
+
+% first layer has inputs equivalent to input pattern
+r.initialize(input_size, input_neurons, @logsig);
+
+% last layer has neurons equivalent to output target
+r.add_layer(output_neurons, @softmax)
+
+% train & time the performance
+tic
+mse = r.train(epochs, batch_size, training_set);
+toc
+
+% post-computation graph configuration
+plot(1:epochs, mse)
+subplot(2, 1, 2)
+imagesc(r.layers{end}.w);
+colormap(hsv);
+colorbar;
+title('final weight matrix');
 
 %% follow up with validation
-accuracy = r.test(validation_set) / validation * 100;
+accuracy_t = r.test(training_set) / training * 100;
+accuracy_v = r.test(validation_set) / validation * 100;
 
 %% finish with testing if validation was decent
 [ids, images, samples] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
 predictions = r.kaggle(images);
 output=table(ids', predictions');
 output.Properties.VariableNames = {'Id' 'label'};
-writetable(output)
-if accuracy > 80
-    disp 'over 9000'
-else
-    disp 'lower class saiyan'
-end
+writetable(output, sprintf('%s-L%d-E%d-B%d-A%0.2f.csv', 'base', length(r.layers), epochs, batch_size, r.alpha))
