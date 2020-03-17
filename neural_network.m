@@ -97,6 +97,10 @@ classdef neural_network < handle
         % OUTPUT e: error at final layer
         %
         function [a] = forward_propagation(self, p)
+            % normalize the input
+            norm_p = p - min(p(:));
+            p = norm_p ./ max(norm_p(:));
+            
             % compute output of first layer
             a=self.layers{1}.activate(p);      
             
@@ -190,7 +194,9 @@ classdef neural_network < handle
 
                         % step 1: forward prop and get error
                         a = self.forward_propagation(p);
-                        e = t - a;
+                        e = -t.*log(a);
+                       
+%                         e = t - a;
 
                         % step 2 & 3: back prop and set sensitivities
                         self.backpropagate_sensitivities(e, p);

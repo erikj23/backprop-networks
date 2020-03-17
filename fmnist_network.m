@@ -4,7 +4,8 @@ clear
 close all
 
 %% load images, labels, & perform preprocessing
-[sample_set, samples] = create_sample_set('../../downloads/FMNIST/train.csv');
+[sample_set, samples] = create_sample_set('C:\Users\Mike\Documents\css-485\hw\backprop-networks\train.csv');
+[test_set, test_examples] = create_sample_set('C:\Users\Mike\Documents\css-485\hw\backprop-networks\test.csv');
 
 %% split samples into a training & validation set
 training = samples*0.70;
@@ -13,11 +14,11 @@ training_set = sample_set(1:training);
 validation_set = sample_set(training:training+validation);
 
 %% set hyper-parameters
-epochs = 1;
-batch_size = 100;
+epochs = 50;
+batch_size = 500;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [10];
+input_neurons_list = [100];
 output_neurons = length(sample{2});
 
 %% train & graph results
@@ -37,7 +38,7 @@ for input_neurons=input_neurons_list
     r.initialize(input_size, input_neurons, @logsig);
     %r.add_layer(10, @logsig)
     % last layer has neurons equivalent to output target
-    r.add_layer(output_neurons, @logsig)
+    r.add_layer(output_neurons, @sft_max)
     
     % train & time the performance
     tic
@@ -54,15 +55,21 @@ for input_neurons=input_neurons_list
 end
 
 %% follow up with validation
-accuracy = r.test(validation_set) / validation * 100;
+size(training_set)
+size(validation_set)
+size(test_set)
+tr_accuracy = r.test(training_set) / training * 100
+v_accuracy = r.test(validation_set) / validation * 100
+% te_accuracy = r.test(test_set) / test_examples * 100
+
 
 %% finish with testing if validation was decent
-[ids, images, samples] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
+[ids, images, samples] = load_fmnist_tests('C:\Users\Mike\Documents\css-485\hw\backprop-networks\test.csv');
 predictions = r.kaggle(images);
 output=table(ids', predictions');
 output.Properties.VariableNames = {'Id' 'label'};
 writetable(output)
-if accuracy > 80
+if v_accuracy > 80
     disp 'over 9000'
 else
     disp 'lower class saiyan'
