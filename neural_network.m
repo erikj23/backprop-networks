@@ -97,12 +97,16 @@ classdef neural_network < handle
         %
         function [a] = forward_propagation(self, p)
             % compute output of first layer
-            a=self.layers{1}.activate(p);      
+            a=self.dropout(0.9, self.layers{1}.activate(p));      
             
             % compute next layer using output of previous layer
-            for m=2:length(self.layers)
-                a=self.layers{m}.activate(a);
+            for m=2:length(self.layers)-1
+                a=self.dropout(0.5, self.layers{m}.activate(a));
             end
+            
+            % compute
+            a=self.layers{end}.activate(a);
+            
             
         end
         
@@ -116,12 +120,12 @@ classdef neural_network < handle
         %
         function backpropagate_sensitivities(self, t, p)
             % calculate last layer
-            self.layers{end}.sensitivity_M(t, self.layers{end-1}.a);
+            self.layers{end}.sensitivity_M(t, self.dropout(0.5, self.layers{end-1}.a));
             
             % then can calculate middle layers
             for m=length(self.layers)-1:-1:2
                  self.layers{m}.sensitivity_m(self.layers{m+1}.w, ...
-                     self.layers{m+1}.s, self.layers{m-1}.a);
+                     self.layers{m+1}.s, self.dropout(0.5, self.layers{m-1}.a));
             end
             
             % calculate first layer, a0 = p
@@ -290,6 +294,22 @@ classdef neural_network < handle
                 accuracy_rates(k,1)=(correct/(tests*examples))*100;
                 pixels = pixels + 4;
             end
+        end
+        
+        % dropout_forward applies a mask to 
+        % the layer's weights. this mask is 
+        % composed of randomly sampled values
+        % of 0 or 1, which act as neuron off-switches
+        % for weights that are multiplied by 0
+        %
+        % SYNOPSIS dropout_forward(self, p)
+        %
+        % INPUT p: probability
+        %
+        function d = dropout(self, p, a)
+            
+            mask = binornd(1,p,size(a));
+            d = a .* (mask / (1-0.5));
         end
     end
 end
