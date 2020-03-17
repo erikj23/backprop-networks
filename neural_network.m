@@ -114,9 +114,9 @@ classdef neural_network < handle
         % INPUT e: error at last layer
         % INPUT p: a0 = p
         %
-        function backpropagate_sensitivities(self, e, p)
+        function backpropagate_sensitivities(self, t, p)
             % calculate last layer
-            self.layers{end}.sensitivity_M(e, self.layers{end-1}.a);
+            self.layers{end}.sensitivity_M(t, self.layers{end-1}.a);
             
             % then can calculate middle layers
             for m=length(self.layers)-1:-1:2
@@ -177,7 +177,6 @@ classdef neural_network < handle
             end
 
             % plot data container moved to gpu
-            %mse = gpuArray(zeros(1, epochs));
             mse = zeros(1, epochs);
             
             % backpropagation algorithm
@@ -189,19 +188,16 @@ classdef neural_network < handle
 
                         % step 1: forward prop and get error
                         a = self.forward_propagation(p);
-                        e = t - a;
-
+                        e = -t .* log(a);
                         % step 2 & 3: back prop and set sensitivities
-                        self.backpropagate_sensitivities(e, p);
+                        self.backpropagate_sensitivities(t, p);
                     end
+                    
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
                 mse(k) = e' * e;
             end
-            
-            % plot data container retrieved from gpu
-            %mse = gather(mse);
         end
         
         %
@@ -224,7 +220,7 @@ classdef neural_network < handle
                 p=test_set{sample}{1};
                 t=test_set{sample}{2};
                 a=self.forward_propagation(p);
-                n_correct = n_correct + isequal(compet(a),t);
+                n_correct = n_correct + isequal(compet(a), t);
             end
         end
         

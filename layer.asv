@@ -81,7 +81,6 @@ classdef layer < handle
         % OUTPUT n: net input to transfer function
         %
         function [n] = net_input(self, p)
-            
             self.n = self.w * p + self.b;
             n = self.n;
         end
@@ -95,16 +94,13 @@ classdef layer < handle
         % INPUT e: error at final layer (from forward propagation)
         % INPUT prev_a: output a(m-1) for batch computation
         %
-        function sensitivity_M(self, t, prev_a)
+        function sensitivity_M(self, e, prev_a)
             % computes jacobian matrix
             if isequal(self.f, @logsig)
-                e = t - self.a;
                 self.s = (-2) * self.df(self.n) .* e;
             elseif isequal(self.f, @softmax)
-                e = -sum(t .* log(self.a));
-                self.s = (-2) * (t - self.a) .* e;
+                self.s = self.df(self.a) .* e;
             elseif isequal(self.f, @purelin)
-                e = t - self.a;
                 self.s = (-2) * self.df() .* e;
             end
             
@@ -124,8 +120,8 @@ classdef layer < handle
         % INPUT prev_a: output a(m-1) for batch computation
         %
         function sensitivity_m(self, next_w, next_s, prev_a)
-            self.s = self.df(self.n) .* next_w' * next_s;
-            %self.s = (1 - self.a) .* self.a .* next_w' * next_s;
+            %self.s = self.df(self.n) .* next_w' * next_s;
+            self.s = (1 - self.a) .* self.a .* next_w' * next_s;
             
             % accumulate batch sensitivity
             self.qw = self.qw + self.s * prev_a';
