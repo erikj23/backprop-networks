@@ -169,7 +169,8 @@ classdef neural_network < handle
         % INPUT training_set: training data in the format { {p t} ... } 
         %   where p & t are column vectors
         %
-        function [mse] = train(self, epochs, batch_size, training_set)
+        function [accuracy_rates] = train(self, epochs, batch_size, training_set)
+            accuracy_rates = epochs;
             samples = length(training_set);
             if ~self.initialized
                 error('not initialized')
@@ -204,7 +205,8 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
-                mse(k) = e' * e;
+                accuracy_rates(k) = self.test(training_set) / length(training_set) * 100;
+%                 mse(k) = e' * e;
             end
             
             % plot data container retrieved from gpu

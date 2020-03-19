@@ -14,11 +14,11 @@ training_set = sample_set(1:training);
 validation_set = sample_set(training:training+validation);
 
 %% set hyper-parameters
-epochs = 50;
-batch_size = 500;
+epochs = 10;
+batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
-input_neurons_list = [100];
+input_neurons_list = [10];
 output_neurons = length(sample{2});
 
 %% train & graph results
@@ -29,7 +29,7 @@ for input_neurons=input_neurons_list
     hold on; grid on;
     title('mean squared error:epochs')
     xlabel('epochs')
-    ylabel('mse')
+    ylabel('accuracy %')
     
     % create a network
     r = neural_network;
@@ -42,11 +42,11 @@ for input_neurons=input_neurons_list
     
     % train & time the performance
     tic
-    mse = r.train(epochs, batch_size, training_set);
+    accuracy_rates = r.train(epochs, batch_size, training_set);
     toc
     
     % post-computation graph configuration
-    plot(1:epochs, mse)
+    plot(1:epochs, accuracy_rates)
     subplot(2, 1, 2)
     imagesc(r.layers{end}.w);
     colormap(hsv);
@@ -55,12 +55,13 @@ for input_neurons=input_neurons_list
 end
 
 %% follow up with validation
+training
 size(training_set)
 size(validation_set)
 size(test_set)
 tr_accuracy = r.test(training_set) / training * 100
 v_accuracy = r.test(validation_set) / validation * 100
-% te_accuracy = r.test(test_set) / test_examples * 100
+
 
 
 %% finish with testing if validation was decent
@@ -68,9 +69,4 @@ v_accuracy = r.test(validation_set) / validation * 100
 predictions = r.kaggle(images);
 output=table(ids', predictions');
 output.Properties.VariableNames = {'Id' 'label'};
-writetable(output)
-if v_accuracy > 80
-    disp 'over 9000'
-else
-    disp 'lower class saiyan'
-end
+writetable(output, sprintf('%s-L%d-E%d-B%d-A%0.2f.csv', 'base', length(r.layers), epochs, batch_size, r.alpha))
