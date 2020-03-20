@@ -164,8 +164,10 @@ classdef neural_network < handle
         % INPUT training_set: training data in the format { {p t} ... } 
         %   where p & t are column vectors
         %
-        function [mse] = train(self, epochs, batch_size, training_set)
+        function [accuracy_t, accuracy_v, loss] = train(self, epochs, batch_size, training_set, validation_set)
             samples = length(training_set);
+            training = samples;
+            validation = length(validation_set);
             if ~self.initialized
                 error('not initialized')
             elseif epochs < 1 
@@ -176,8 +178,10 @@ classdef neural_network < handle
                 error('training set cannot be empty')
             end
 
-            % plot data container moved to gpu
-            mse = zeros(1, epochs);
+            % plot data         
+            accuracy_t = zeros(1, epochs);
+            accuracy_v = zeros(1, epochs);
+            loss = zeros(1, epochs);
             
             % backpropagation algorithm
             for k=1:epochs
@@ -187,8 +191,8 @@ classdef neural_network < handle
                         t = training_set{sample+job}{2};
 
                         % step 1: forward prop and get error
-                        a = self.forward_propagation(p);
-                        e = -t .* log(a);
+                        a=self.forward_propagation(p);
+                        
                         % step 2 & 3: back prop and set sensitivities
                         self.backpropagate_sensitivities(t, p);
                     end
@@ -196,7 +200,15 @@ classdef neural_network < handle
                     % step 4: update w & b for each layer
                     self.update_layers(p, batch_size);
                 end
-                mse(k) = e' * e;
+                
+                % data updates made each epoch
+                accuracy_t(k) = self.test(training_set) / training * 100;
+                accuracy_v(k) = self.test(validation_set) / validation * 100;
+                
+                e = -t .* log(a);
+                loss(k) = e' * e;
+                
+                fprintf('epoch[%d] accuracy[t%2.2f|v%2.2f] error[%1.2f]\n', k, accuracy_t(k), accuracy_v(k), loss(k));
             end
         end
         

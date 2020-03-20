@@ -13,14 +13,23 @@ training_set = sample_set(1:training);
 validation_set = sample_set(training+1:training+validation);
 
 %% set hyper-parameters
-epochs = 10;
+epochs = 1;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
 input_neurons = 10;
 output_neurons = length(sample{2});
 
-%% train network
+%% train & graph results
+% pre-computation graph configuration
+figure;
+subplot(2, 1, 1);
+hold on; grid on;
+title('mean squared error:epochs')
+xlabel('epochs')
+ylabel('mse')
+
+% create a network
 r = neural_network;
 
 % first layer has inputs equivalent to input pattern
@@ -31,30 +40,14 @@ r.add_layer(output_neurons, @softmax)
 
 % train & time the performance
 tic
-[accuracy_t, accuracy_v, loss] = r.train(epochs, batch_size, training_set, validation_set);
+accuracy_t, accuracy_v = r.train(epochs, batch_size, training_set, training, validation);
 toc
 
-%% graph results
-figure;
-hold on; grid on;
-
-% accuracy
-subplot(3, 1, 1);
+% post-computation graph configuration
 plot(1:epochs, accuracy_t)
 plot(1:epochs, accuracy_v)
-title('accuracy:epochs')
-ylabel('% accuracy')
-xlabel('epochs')
 
-% mse
-subplot(3, 1, 2)
-plot(1:epochs, loss)
-title('mean squared error:epochs')
-ylabel('error')
-xlabel('epochs')
-
-% weight matrix
-subplot(3, 1, 3)
+subplot(2, 1, 2)
 imagesc(r.layers{end}.w);
 colormap(hsv);
 colorbar;
@@ -65,8 +58,8 @@ title('final weight matrix');
 %accuracy_v = r.test(validation_set) / validation * 100;
 
 %% finish with testing if validation was decent
-%[ids, images, samples] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
-%predictions = r.kaggle(images);
-%output=table(ids', predictions');
-%output.Properties.VariableNames = {'Id' 'label'};
-%writetable(output, sprintf('%s-L%d-E%d-B%d-A%0.2f.csv', 'base', length(r.layers), epochs, batch_size, r.alpha))
+[ids, images, samples] = load_fmnist_tests('../../downloads/FMNIST/test.csv');
+predictions = r.kaggle(images);
+output=table(ids', predictions');
+output.Properties.VariableNames = {'Id' 'label'};
+writetable(output, sprintf('%s-L%d-E%d-B%d-A%0.2f.csv', 'base', length(r.layers), epochs, batch_size, r.alpha))
