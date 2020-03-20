@@ -321,7 +321,7 @@ classdef neural_network < handle
         %
         function d = dropout(~, p, a)
             mask = binornd(1, p, size(a));
-            d = a .* (mask / (1-0.5));
+            d = a .* mask;
         end
     end
 end

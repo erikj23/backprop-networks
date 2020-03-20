@@ -13,7 +13,7 @@ training_set = sample_set(1:training);
 validation_set = sample_set(training+1:training+validation);
 
 %% set hyper-parameters
-epochs = 10;
+epochs = 2;
 batch_size = 100;
 sample = sample_set{1};
 input_size = length(sample{1});
@@ -36,10 +36,11 @@ toc
 
 %% graph results
 figure;
-hold on; grid on;
+
 
 % accuracy
 subplot(3, 1, 1);
+hold on;
 plot(1:epochs, accuracy_t)
 plot(1:epochs, accuracy_v)
 title('accuracy:epochs')
@@ -47,14 +48,14 @@ ylabel('% accuracy')
 xlabel('epochs')
 
 % mse
-subplot(3, 1, 2)
+subplot(3, 1, 2);
 plot(1:epochs, loss)
 title('mean squared error:epochs')
 ylabel('error')
 xlabel('epochs')
 
 % weight matrix
-subplot(3, 1, 3)
+subplot(3, 1, 3);
 imagesc(r.layers{end}.w);
 colormap(hsv);
 colorbar;
