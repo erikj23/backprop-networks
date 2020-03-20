@@ -1,3 +1,5 @@
-.asv
+*.asv
 .DS*
 *.csv
+*.txt
+

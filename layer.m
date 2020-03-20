@@ -98,7 +98,7 @@ classdef layer < handle
             % computes jacobian matrix
             if isequal(self.f, @logsig)
                 e = t - self.a;
-                self.s = (-2) * self.df(self.n) .* e;
+                self.s = (-2) * self.df(self.n).* e;
             elseif isequal(self.f, @softmax)
                 e = -sum(t .* log(self.a));
                 self.s = (-2) * (t - self.a) .* e;
