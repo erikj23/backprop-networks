@@ -10,6 +10,7 @@ classdef neural_network < handle
     end 
     properties%(SetAccess='private')
         alpha = 0.1;
+        drop = 1;
         layers = {};
     end 
     
@@ -97,11 +98,11 @@ classdef neural_network < handle
         %
         function [a] = forward_propagation(self, p)
             % compute output of first layer
-            a=self.dropout(0.9, self.layers{1}.activate(p));      
+            a=self.dropout(self.drop, self.layers{1}.activate(p));      
             
             % compute next layer using output of previous layer
             for m=2:length(self.layers)-1
-                a=self.dropout(0.5, self.layers{m}.activate(a));
+                a=self.dropout(self.drop, self.layers{m}.activate(a));
             end
             
             % compute
@@ -120,12 +121,12 @@ classdef neural_network < handle
         %
         function backpropagate_sensitivities(self, t, p)
             % calculate last layer
-            self.layers{end}.sensitivity_M(t, self.dropout(0.5, self.layers{end-1}.a));
+            self.layers{end}.sensitivity_M(t, self.dropout(self.drop, self.layers{end-1}.a));
             
             % then can calculate middle layers
             for m=length(self.layers)-1:-1:2
                  self.layers{m}.sensitivity_m(self.layers{m+1}.w, ...
-                     self.layers{m+1}.s, self.dropout(0.5, self.layers{m-1}.a));
+                     self.layers{m+1}.s, self.dropout(self.drop, self.layers{m-1}.a));
             end
             
             % calculate first layer, a0 = p
@@ -205,7 +206,7 @@ classdef neural_network < handle
                     self.update_layers(p, batch_size);
                 end
                 
-                % data updates made each epoch
+                % plot data updates made each epoch
                 accuracy_t(k) = self.test(training_set) / training * 100;
                 accuracy_v(k) = self.test(validation_set) / validation * 100;
                 
@@ -318,9 +319,8 @@ classdef neural_network < handle
         %
         % INPUT p: probability
         %
-        function d = dropout(self, p, a)
-            
-            mask = binornd(1,p,size(a));
+        function d = dropout(~, p, a)
+            mask = binornd(1, p, size(a));
             d = a .* (mask / (1-0.5));
         end
     end
